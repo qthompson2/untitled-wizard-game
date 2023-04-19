@@ -59,18 +59,24 @@ public class PlayerController : MonoBehaviour
         float minScale = 0.9f;
         
         if (animationState == "growing" && bobbing){
-            transform.localScale += scaleChange;
+            spriteObject.transform.localScale += scaleChange;
         } else if (animationState == "shrinking" && bobbing) {
-            transform.localScale -= scaleChange;
+            spriteObject.transform.localScale -= scaleChange;
         } else if (!(bobbing)) {
-            transform.localScale = new Vector3(1, 1, 1);
+            spriteObject.transform.localScale = new Vector3(1, 1, 1);
         }
-        if (transform.localScale.y < minScale) {
+        if (spriteObject.transform.localScale.y < minScale) {
             animationState = "growing";
             scaleChange = new Vector3(0f, 0.001f, 0f);
-        } else if (transform.localScale.y > maxScale) {
+        } else if (spriteObject.transform.localScale.y > maxScale) {
             animationState = "shrinking";
             scaleChange = new Vector3(0f, 0.002f, 0f);
+        }
+
+        if (Input.GetAxis("Horizontal") < 0) {
+            spriteObject.GetComponent<SpriteRenderer>().flipX = true;
+        } else if (Input.GetAxis("Horizontal") > 0) {
+            spriteObject.GetComponent<SpriteRenderer>().flipX = false;
         }
 
     }
