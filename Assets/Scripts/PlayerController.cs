@@ -7,22 +7,34 @@ public class PlayerController : MonoBehaviour
     public int speed = 10;
     public GameObject spriteObject;
     public bool bobbing;
-    public int timer = 10;
-    public string animationState = "growing"; //possible values: "shrinking", "growing"
+    public string animationState = "growing";
     public Vector3 scaleChange = new Vector3(0f, 0.001f, 0f);
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    public HealthBar healthBar;
+    public int maxHealth;
+    public int health;
+    public int maxTempHealth;
+    public int tempHealth;
+    public int immortalityFrameTimer;
+    public int maxIFTimer;
+    void Awake() {
+        healthBar.SetMaxHealth(maxHealth);
+        healthBar.SetHealth(maxHealth);
+        healthBar.SetMaxTemp(maxTempHealth);
+        healthBar.SetTemp(tempHealth);
+        immortalityFrameTimer = 0;
     }
 
-    // Update is called once per frame
     void Update() 
     {
         Move(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         Animate();
+        if (immortalityFrameTimer >= 0) {
+            immortalityFrameTimer -= 1;
+        }
+
+        if (Input.GetKeyDown(KeyCode.I)) {
+            Injure(1);
+        }
     }
 
     private void Move(float x, float y)
@@ -79,5 +91,34 @@ public class PlayerController : MonoBehaviour
             spriteObject.GetComponent<SpriteRenderer>().flipX = false;
         }
 
+    }
+    public void Injure(int value) {
+        if (immortalityFrameTimer < 0) {
+            immortalityFrameTimer = maxIFTimer;
+            if (tempHealth == 0) {
+                if (health - value >= 0) {
+                    health -= value;
+                    healthBar.SetHealth(health);
+                } else {
+                    health = 0;
+                    healthBar.SetHealth(0);
+                }
+            } else {
+                if (tempHealth - value >= 0) {
+                    tempHealth -= value;
+                    healthBar.SetTemp(tempHealth);
+                } else if (health + tempHealth - value >= 0) {
+                    tempHealth = 0;
+                    health = health + tempHealth - value;
+                    healthBar.SetTemp(0);
+                    healthBar.SetHealth(health);
+                } else {
+                    tempHealth = 0;
+                    health = 0;
+                    healthBar.SetTemp(0);
+                    healthBar.SetHealth(0);
+                }
+            }
+        }
     }
 }
