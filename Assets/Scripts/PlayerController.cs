@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
     public int tempHealth;
     public int immortalityFrameTimer;
     public int maxIFTimer;
+    public GameObject manabolt;
+    public int lastX;
+    public int lastY;
     void Awake() {
         healthBar.SetMaxHealth(maxHealth);
         healthBar.SetHealth(maxHealth);
@@ -35,6 +38,10 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I)) {
             Injure(1);
         }
+
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            CastManaBolt();
+        }
     }
 
     private void Move(float x, float y)
@@ -43,18 +50,38 @@ public class PlayerController : MonoBehaviour
             //[w] and [d]
             x = Mathf.Sqrt((x * x) / 2);
             y = Mathf.Sqrt((y * y) / 2);
+            lastX = 1;
+            lastY = 1;
         } else if (x < 0 && y < 0) {
             //[a] and [s]
             x = -Mathf.Sqrt((x * x) / 2);
             y = -Mathf.Sqrt((y * y) / 2);
+            lastX = -1;
+            lastY = -1;
         } else if (x > 0 && y < 0) {
             //[d] and [s]
             x = Mathf.Sqrt((x * x) / 2);
             y = -Mathf.Sqrt((y * y) / 2);
+            lastX = 1;
+            lastY = -1;
         } else if (x < 0 && y > 0) {
             //[a] and [w]
             x = -Mathf.Sqrt((x * x) / 2);
             y = Mathf.Sqrt((y * y) / 2);
+            lastX = -1;
+            lastY = 1;
+        } else if (x > 0 && y < 0.9) {
+            lastX = 1;
+            lastY = 0;
+        } else if (x < 0 && y < 0.9) {
+            lastX = -1;
+            lastY = 0;
+        } else if (y > 0 && x < 0.9) {
+            lastX = 0;
+            lastY = 1;
+        } else if (y < 0 && x < 0.9) {
+            lastX = 0;
+            lastY = -1;
         }
         
         if (x != 0 || y != 0) {
@@ -120,5 +147,11 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void CastManaBolt() {
+        Projectile p = new Projectile();
+        Instantiate(manabolt, transform.position, Quaternion.LookRotation(new Vector3(0, 0, 0)));
+        p.SetProjectile(new Vector2(lastX, lastY), 10, 1);
     }
 }
